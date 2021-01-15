@@ -1,0 +1,13 @@
+{
+  "name": "DuoRP",
+  "version": "1.0",
+  "description": "Duo Recent Practices",
+  "manifest_version": 2,
+  "content_scripts": [
+    {
+      "matches": ["https://www.duolingo.com/learn"],
+      "js": ["jquery-3.5.1.min.js", "duoRP.js"],
+      "run_at": "document_end"
+    }
+  ]
+}
