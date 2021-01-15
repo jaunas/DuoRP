@@ -3,10 +3,14 @@ $.get("2017-06-30/users/22745878?fields=xpGains,currentCourse", function(data) {
 });
 
 function processResponse(data) {
-  var skills = [];
-  data['currentCourse']['skills'].forEach((skill) => {
-    skills.push(...skill);
-  });
+  data = processData(data);
+
+  var xpProgress = $("h2:contains('XP Progress')").first().parent().parent();
+  xpProgress.after(buildRecentXpDiv(data['xpGains'], xpProgress[0].className));
+}
+
+function processData(data) {
+  var skills = data['currentCourse']['skills'].flat();
 
   data['xpGains'].forEach((item) => {
     var skill = skills.find(skill => {
@@ -14,10 +18,18 @@ function processResponse(data) {
     });
 
     item['skill'] = skill;
+    if (skill) {
+      skill['xpGains'] = skill['xpGains'] || [];
+      skill['xpGains'].push(item);
+    }
   });
 
-  var xpProgress = $("h2:contains('XP Progress')").first().parent().parent();
-  xpProgress.after(buildRecentXpDiv(data['xpGains'], xpProgress[0].className));
+  var xpGains = data['xpGains'];
+
+  return {
+    skills: skills,
+    xpGains: xpGains
+  }
 }
 
 function buildRecentXpTable(xpGains) {
