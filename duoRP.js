@@ -5,8 +5,30 @@ $.get("2017-06-30/users/22745878?fields=xpGains,currentCourse", function(data) {
 function processResponse(data) {
   data = processData(data);
 
-  var xpProgress = $("h2:contains('XP Progress')").first().parent().parent();
-  xpProgress.after(buildRecentXpDiv(data['xpGains'], xpProgress[0].className));
+  var $xpProgress = $("h2:contains('XP Progress')").first().parent().parent();
+  $xpProgress.after(buildRecentXpDiv(data['xpGains'], $xpProgress[0].className));
+
+  $("div[data-test='skill-icon']").each(function() {
+    var $circle = $(this).parent();
+    var label = $circle.parent().parent().children().last().text();
+
+    var skill = data['skills'].find(element => element.shortName == label);
+    if (skill['finishedLevels'] < skill['levels'] && skill['xpGains']) {
+      var lastGain = skill['xpGains'].slice(-1)[0];
+      var days = dateDiffInDays(new Date(lastGain.time * 1000));
+
+      var color = 'red';
+      if (days == 0) {
+        color = 'green';
+      } else if (days == 1) {
+        color = 'yellow';
+      } else if (days == 2) {
+        color = 'orange';
+      }
+
+      $circle.prepend('<div class="circle ' + color + '"></div>');
+    }
+  });
 }
 
 function processData(data) {
@@ -59,4 +81,14 @@ function buildRecentXpDiv(xpGains, className) {
 function getTimeFromTimestamp(timestamp) {
   var date = new Date(timestamp * 1000);
   return date.toLocaleString();
+}
+
+const _MS_PER_DAY = 1000 * 60 * 60 * 24;
+
+function dateDiffInDays(a, b) {
+  const utc1 = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
+  var b = new Date();
+  const utc2 = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
+
+  return Math.floor((utc2 - utc1) / _MS_PER_DAY);
 }

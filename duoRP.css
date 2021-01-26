@@ -1,0 +1,24 @@
+.circle {
+  position: absolute;
+  transform: translate(0%,-100%);
+  width: 100%;
+  height: 100%;
+  border-radius: 53px;
+  border: solid 17px;
+}
+
+.circle.red {
+  border-color: red;
+}
+
+.circle.orange {
+  border-color: orange;
+}
+
+.circle.yellow {
+  border-color: yellow;
+}
+
+.circle.green {
+  border-color: green;
+}
