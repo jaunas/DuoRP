@@ -3,35 +3,13 @@ $.get("2017-06-30/users/22745878?fields=xpGains,currentCourse", function(data) {
 });
 
 function processResponse(data) {
-  data = processData(data);
+  data = parseData(data);
 
-  var $xpProgress = $("h2:contains('XP Progress')").first().parent().parent();
-  $xpProgress.after(buildRecentXpDiv(data['xpGains'], $xpProgress[0].className));
-
-  $("div[data-test='skill-icon']").each(function() {
-    var $circle = $(this).parent();
-    var label = $circle.parent().parent().children().last().text();
-
-    var skill = data['skills'].find(element => element.shortName == label);
-    if (skill['finishedLevels'] < skill['levels'] && skill['xpGains']) {
-      var lastGain = skill['xpGains'].slice(-1)[0];
-      var days = dateDiffInDays(new Date(lastGain.time * 1000));
-
-      var color = 'red';
-      if (days == 0) {
-        color = 'green';
-      } else if (days == 1) {
-        color = 'yellow';
-      } else if (days == 2) {
-        color = 'orange';
-      }
-
-      $circle.prepend('<div class="circle ' + color + '"></div>');
-    }
-  });
+  addTableWithRecentXP(data.xpGains);
+  addColorMarksToCircles(data.skills);
 }
 
-function processData(data) {
+function parseData(data) {
   var skills = data['currentCourse']['skills'].flat();
 
   data['xpGains'].forEach((item) => {
@@ -52,6 +30,14 @@ function processData(data) {
     skills: skills,
     xpGains: xpGains
   }
+}
+
+// Recent XP table
+
+function addTableWithRecentXP(xpGains) {
+  var $xpProgress = $("h2:contains('XP Progress')").first().parent().parent();
+  $xpProgress.after(buildRecentXpDiv(xpGains, $xpProgress[0].className));
+
 }
 
 function buildRecentXpTable(xpGains) {
@@ -77,6 +63,34 @@ function buildRecentXpDiv(xpGains, className) {
 
   return div;
 }
+
+// Color marks on circles
+
+function addColorMarksToCircles(skills) {
+  $("div[data-test='skill-icon']").each(function() {
+    var $circle = $(this).parent();
+    var label = $circle.parent().parent().children().last().text();
+
+    var skill = skills.find(element => element.shortName == label);
+    if (skill['finishedLevels'] < skill['levels'] && skill['xpGains']) {
+      var lastGain = skill['xpGains'].slice(-1)[0];
+      var days = dateDiffInDays(new Date(lastGain.time * 1000));
+
+      var color = 'red';
+      if (days == 0) {
+        color = 'green';
+      } else if (days == 1) {
+        color = 'yellow';
+      } else if (days == 2) {
+        color = 'orange';
+      }
+
+      $circle.prepend('<div class="circle ' + color + '"></div>');
+    }
+  });
+}
+
+// Helpers
 
 function getTimeFromTimestamp(timestamp) {
   var date = new Date(timestamp * 1000);
