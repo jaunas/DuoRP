@@ -22,3 +22,11 @@
 .circle.green {
   border-color: green;
 }
+
+#recent-xp {
+  text-align: center;
+}
+
+.pager {
+  display: inline-block;
+}

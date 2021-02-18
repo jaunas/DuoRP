@@ -36,13 +36,14 @@ function parseData(data) {
 
 function addTableWithRecentXP(xpGains) {
   var $xpProgress = $("h2:contains('XP Progress')").first().parent().parent();
-  $xpProgress.after(buildRecentXpDiv(xpGains, $xpProgress[0].className));
-
+  $xpProgress.after(getRecentXpHtml($xpProgress[0].className));
+  xpGains.reverse();
+  addPagination(xpGains);
 }
 
-function buildRecentXpTable(xpGains) {
-  var rows = '<tr><th>Time</th><th>XP</th><th>Lesson</th></tr>';
-  xpGains.reverse();
+function buildRecentXpRows(xpGains) {
+  var rows = '';
+
   xpGains.forEach((item) => {
     var row = '<tr>';
     row += '<td>' + getTimeFromTimestamp(item['time']) + '</td>';
@@ -53,15 +54,35 @@ function buildRecentXpTable(xpGains) {
     rows += row;
   });
 
-  return '<table>' + rows + '</table>';
+  return rows;
 }
 
-function buildRecentXpDiv(xpGains, className) {
-  var div = '<div class="' + className + '">';
-  div += buildRecentXpTable(xpGains);
-  div += '</div>';
+function getRecentXpHtml(className) {
+  return `
+    <div class="${className}" id="recent-xp">
+      <table>
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>XP</th>
+            <th>Lesson</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <div class="pager"></div>
+    </div>
+  `;
+}
 
-  return div;
+function addPagination(xpGains) {
+  $('#recent-xp > .pager').pagination({
+      dataSource: xpGains,
+      showPageNumbers: false,
+      callback: function(data, pagination) {
+        $("#recent-xp > table > tbody").html(buildRecentXpRows(data));
+      }
+  });
 }
 
 // Color marks on circles

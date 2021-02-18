@@ -6,8 +6,8 @@
   "content_scripts": [
     {
       "matches": ["https://www.duolingo.com/learn"],
-      "js": ["jquery-3.5.1.min.js", "duoRP.js"],
-      "css": ["duoRP.css"],
+      "js": ["jquery-3.5.1.min.js", "pagination.min.js", "duoRP.js"],
+      "css": ["duoRP.css", "pagination.min.css"],
       "run_at": "document_end"
     }
   ]
